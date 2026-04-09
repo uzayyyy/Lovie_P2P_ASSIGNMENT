@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(specify --version)",
+      "Bash(uv --version)",
+      "Bash(uv tool:*)",
+      "Bash(export PATH=\"/Users/uzaycevikkantekin/.local/bin:$PATH\")",
+      "Bash(specify init:*)"
+    ]
+  }
+}
