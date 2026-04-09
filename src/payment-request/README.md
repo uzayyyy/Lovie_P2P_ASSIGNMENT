@@ -16,10 +16,14 @@ P2P Payment Request feature — React Admin v5 + Supabase.
 # 1. Install dependencies
 npm install
 
-# 2. Copy env file and fill in your Supabase credentials
+# 2. Start local Supabase
+supabase start
+supabase db push
+
+# 3. Copy env files and fill in your Supabase credentials
 cp .env.local.example .env.local
 
-# 3. Start dev server
+# 4. Start dev server
 npm run dev
 ```
 
@@ -30,26 +34,32 @@ npm run dev
 | `npm run dev` | Start Vite dev server (http://localhost:5173) |
 | `npm run build` | Type-check + production build |
 | `npm run preview` | Preview production build |
-| `npm test` | Run tests in watch mode |
+| `npm test` | Run the test suite once |
+| `npm run test:watch` | Run tests in watch mode |
 | `npm run test:run` | Run tests once (CI) |
 
 ### Project structure
 
 ```
 src/
-  components/   # Shared UI components
-  pages/        # Standalone pages (Login, Callback, PublicRequest)
-  services/     # Supabase client, data helpers
-  hooks/        # Custom React hooks
-  App.tsx       # Root component
-  main.tsx      # Entry point
-public/         # Static assets
-tests/          # Test setup and helpers
+  auth/                      # Magic link auth provider and pages
+  components/                # Shared UI components
+  pages/                     # Standalone pages (Login, Callback, PublicRequest)
+  providers/                 # Supabase and React Admin providers
+  resources/paymentRequests/ # React Admin resource views
+  types/                     # Shared domain types
+supabase/
+  migrations/               # SQL migrations
+  functions/expire-requests/ # Edge function fallback
+tests/
+  contract/                 # RLS and schema-level tests
+  integration/              # End-to-end flows against local Supabase
+  unit/                     # Component and validation tests
 ```
 
 ### Next tasks
 
-- T002: Install ra-supabase + configure dataProvider
-- T003: Set up Supabase local dev (`supabase start`)
-- T011–T016: Write DB migrations (profiles, payment_requests, RLS)
-- T019: Implement authProvider (Magic Link)
+- Wire Supabase migrations and local CLI config
+- Build React Admin resources for create/list/show flows
+- Add public shareable request page and simulation actions
+- Finish contract, integration, and unit test coverage

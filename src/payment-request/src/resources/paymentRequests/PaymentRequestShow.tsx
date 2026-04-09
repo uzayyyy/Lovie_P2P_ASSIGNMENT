@@ -1,0 +1,69 @@
+import { Box, Stack } from '@mui/material'
+import {
+  DateField,
+  NumberField,
+  Show,
+  SimpleShowLayout,
+  TextField,
+  useGetIdentity,
+  useRecordContext,
+} from 'react-admin'
+import { CancelButton } from 'src/components/CancelButton'
+import { DeclineButton } from 'src/components/DeclineButton'
+import { ExpiryCountdownField } from 'src/components/ExpiryCountdown'
+import { PayButton } from 'src/components/PayButton'
+import { ShareableLinkField } from 'src/components/ShareableLinkField'
+import { StatusField } from 'src/components/StatusBadge'
+import type { PaymentRequest } from 'src/types'
+
+type Identity = {
+  id: string
+}
+
+const PaymentRequestShowContent = () => {
+  const record = useRecordContext<PaymentRequest>()
+  const { data } = useGetIdentity()
+  const identity = data as Identity | undefined
+
+  if (!record) {
+    return null
+  }
+
+  const isIncoming = identity?.id !== undefined && record.recipient_id === identity.id
+  const isOutgoing = identity?.id !== undefined && record.sender_id === identity.id
+  const isPending = record.status === 'pending'
+
+  return (
+    <SimpleShowLayout>
+      <NumberField options={{ currency: 'TRY', style: 'currency' }} source="amount" />
+      <TextField label="Sender" source="sender_id" />
+      <TextField label="Recipient Email" source="recipient_email" />
+      <TextField label="Recipient Phone" source="recipient_phone" />
+      <TextField source="note" />
+      <StatusField />
+      <DateField showTime source="created_at" />
+      <ExpiryCountdownField />
+      <ShareableLinkField />
+
+      <Box sx={{ pt: 1 }}>
+        <Stack direction={{ sm: 'row', xs: 'column' }} spacing={2}>
+          {isIncoming && isPending ? (
+            <>
+              <PayButton />
+              <DeclineButton />
+            </>
+          ) : null}
+          {isOutgoing && isPending ? <CancelButton /> : null}
+        </Stack>
+      </Box>
+    </SimpleShowLayout>
+  )
+}
+
+const PaymentRequestShow = () => (
+  <Show>
+    <PaymentRequestShowContent />
+  </Show>
+)
+
+export default PaymentRequestShow

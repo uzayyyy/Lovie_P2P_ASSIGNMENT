@@ -1,50 +1,68 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Payment Request App Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Security-First (Fintech Mandate)
+All features involving money movement, user identity, or financial state MUST prioritize security.
+- No financial action (Pay, Decline, Cancel) may be performed without an authenticated session.
+- All Supabase tables MUST have Row Level Security (RLS) enabled.
+- No sensitive data (amounts, emails, phone numbers) may be exposed in shareable URLs — only opaque request IDs.
+- Auth is via Supabase Magic Link; no passwords stored.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. API-First via Supabase
+The database layer IS the API layer. Business logic lives in:
+- Supabase RLS policies for access control
+- Supabase Edge Functions for side-effects (expiration, simulation)
+- React Admin `dataProvider` as the sole client interface to Supabase
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+No custom REST API server shall be introduced unless Supabase cannot fulfill the requirement.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### III. Test-First (NON-NEGOTIABLE)
+TDD is mandatory:
+1. Write tests describing the expected behavior
+2. Get user approval on test cases
+3. Confirm tests FAIL (Red)
+4. Implement to make tests pass (Green)
+5. Refactor
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+No implementation code may be written before step 3 is confirmed.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### IV. Integration Testing Priority
+Prefer real Supabase (local via `supabase start`) over mocks.
+- RLS policy tests MUST use real DB rows
+- Payment simulation MUST be tested end-to-end (status transition: Pending → Paid)
+- Expiration logic MUST be tested with time-manipulated fixtures
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### V. Simplicity (YAGNI)
+- Maximum 3 Supabase tables for v1: `users`, `payment_requests`, `profiles`
+- No additional microservices, no message queues, no caching layer for v1
+- React Admin resources map 1:1 to Supabase tables — no intermediate adapters
+- Every added dependency requires documented justification
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### VI. Responsive Design Contract
+All UI components MUST be functional on:
+- Mobile: 375px minimum width
+- Desktop: 1280px standard
+- React Admin's built-in responsive utilities are preferred over custom CSS breakpoints
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Technology Constraints
+
+- **Frontend**: React Admin v5+ with `ra-supabase` data provider
+- **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
+- **Auth**: Supabase Magic Link (email-based)
+- **Styling**: React Admin default theme + MUI; no external CSS frameworks
+- **No**: Redux, custom REST servers, external payment gateways (simulated only)
+
+## Quality Gates
+
+- All PRs must include passing tests before merge
+- RLS policies must be reviewed alongside any schema change
+- Shareable links must be tested for unauthorized access (non-owner cannot act on request)
+- Payment simulation timing (2–3s) must be covered by a test with a mocked timer
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other practices in this project.
+Amendments require: documented rationale + backward-compatibility assessment.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-04-09 | **Last Amended**: 2026-04-09

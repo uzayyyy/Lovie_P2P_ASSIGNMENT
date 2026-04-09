@@ -5,7 +5,20 @@
       "Bash(uv --version)",
       "Bash(uv tool:*)",
       "Bash(export PATH=\"/Users/uzaycevikkantekin/.local/bin:$PATH\")",
-      "Bash(specify init:*)"
+      "Bash(specify init:*)",
+      "Bash(bash .specify/scripts/bash/setup-plan.sh --json)",
+      "Bash(git checkout:*)",
+      "WebSearch",
+      "Bash(bash /Users/uzaycevikkantekin/Desktop/my-project/.specify/scripts/bash/update-agent-context.sh claude)",
+      "Bash(bash .specify/scripts/bash/check-prerequisites.sh --json)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(git rm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m 'Phase1-T001: add .gitignore, remove node_modules from tracking:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "Bash(brew list:*)",
+      "Read(//Users/uzaycevikkantekin/**)"
     ]
   }
 }

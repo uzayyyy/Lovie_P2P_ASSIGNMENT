@@ -1,5 +1,9 @@
 node_modules/
 dist/
 .env.local
+.env.test
 .env
 coverage/
+supabase/.branches/
+supabase/.temp/
+supabase/.cache/
