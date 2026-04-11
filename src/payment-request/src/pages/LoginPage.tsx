@@ -36,7 +36,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
-  const [mode, setMode] = useState<'password' | 'magic'>('password')
+  const [mode, setMode] = useState<'password' | 'magic'>('magic')
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -192,7 +192,7 @@ const LoginPage = () => {
                     Live Supabase sign-in
                   </Typography>
                   <Typography color="text.secondary">
-                    Sign in with email + password, or send a magic link.
+                    New users: enter your email below — a magic link signs you in and creates your account.
                   </Typography>
                 </Box>
 
@@ -238,7 +238,7 @@ const LoginPage = () => {
                   </Button>
                   {sent ? (
                     <Alert severity="success">
-                      Check your inbox for the magic link. After redirect, you'll land in the live dashboard.
+                      Check your inbox for the magic link. It will sign you in (and create your account if you are new).
                     </Alert>
                   ) : null}
                 </Box>
