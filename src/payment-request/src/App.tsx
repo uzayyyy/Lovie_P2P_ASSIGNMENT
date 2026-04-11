@@ -1,13 +1,14 @@
 import {
   AppBar as MuiAppBar,
   Box,
+  Button,
   CssBaseline,
   ThemeProvider,
   Toolbar,
   Typography,
   createTheme,
 } from '@mui/material'
-import { Admin, Layout, type LayoutProps } from 'react-admin'
+import { Admin, Layout, useLogout, useGetIdentity, type LayoutProps } from 'react-admin'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { authProvider, dataProvider } from 'src/providers'
 import AuthCallbackPage from 'src/pages/AuthCallbackPage'
@@ -66,28 +67,38 @@ const theme = createTheme({
   },
 })
 
-const MinimalAppBar = () => (
-  <MuiAppBar
-    color="transparent"
-    elevation={0}
-    position="sticky"
-    sx={{
-      backdropFilter: 'blur(18px)',
-      borderBottom: '1px solid rgba(18, 50, 95, 0.08)',
-      color: 'text.primary',
-    }}
-  >
-    <Toolbar sx={{ gap: 2, minHeight: { sm: 64, xs: 64 } }}>
-      <Typography sx={{ fontFamily: '"Space Grotesk", "Segoe UI", sans-serif', fontWeight: 700 }}>
-        Lovie Payment Request
-      </Typography>
-      <Box sx={{ flex: 1 }} />
-      <Typography color="text.secondary" variant="body2">
-        Live dashboard
-      </Typography>
-    </Toolbar>
-  </MuiAppBar>
-)
+const MinimalAppBar = () => {
+  const logout = useLogout()
+  const { data: identity } = useGetIdentity()
+
+  return (
+    <MuiAppBar
+      color="transparent"
+      elevation={0}
+      position="sticky"
+      sx={{
+        backdropFilter: 'blur(18px)',
+        borderBottom: '1px solid rgba(18, 50, 95, 0.08)',
+        color: 'text.primary',
+      }}
+    >
+      <Toolbar sx={{ gap: 2, minHeight: { sm: 64, xs: 64 } }}>
+        <Typography sx={{ fontFamily: '"Space Grotesk", "Segoe UI", sans-serif', fontWeight: 700 }}>
+          Lovie Payment Request
+        </Typography>
+        <Box sx={{ flex: 1 }} />
+        {identity?.email ? (
+          <Typography color="text.secondary" sx={{ display: { sm: 'block', xs: 'none' } }} variant="body2">
+            {String(identity.email)}
+          </Typography>
+        ) : null}
+        <Button onClick={() => void logout()} size="small" variant="outlined">
+          Sign out
+        </Button>
+      </Toolbar>
+    </MuiAppBar>
+  )
+}
 
 const EmptyMenu = () => null
 
