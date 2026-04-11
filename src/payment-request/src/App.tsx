@@ -107,6 +107,7 @@ function App() {
                 dataProvider={dataProvider}
                 layout={AppLayout}
                 loginPage={LoginPage}
+                theme={theme}
                 title="Lovie Payment Request"
               >
                 {paymentRequestsResource}
