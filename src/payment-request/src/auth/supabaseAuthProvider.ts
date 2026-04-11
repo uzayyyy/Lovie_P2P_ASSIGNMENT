@@ -6,16 +6,19 @@ type AppIdentity = {
   fullName: string
   avatar?: string
   email?: string
+  phone?: string | null
 }
 
 const isPublicPath = (pathname: string) =>
-  pathname.startsWith('/request/') || pathname === '/auth/callback'
+  pathname.startsWith('/request/')
+  || pathname.startsWith('/demo')
+  || pathname === '/auth/callback'
 
 const baseAuthProvider = supabaseAuthProvider(supabase, {
   getIdentity: async (user): Promise<AppIdentity> => {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('display_name, avatar_url')
+      .select('display_name, avatar_url, phone')
       .eq('id', user.id)
       .maybeSingle()
 
@@ -24,6 +27,7 @@ const baseAuthProvider = supabaseAuthProvider(supabase, {
       fullName: profile?.display_name ?? user.email ?? '',
       avatar: profile?.avatar_url ?? undefined,
       email: user.email ?? undefined,
+      phone: profile?.phone ?? null,
     }
   },
   getPermissions: async (user) => user.id,

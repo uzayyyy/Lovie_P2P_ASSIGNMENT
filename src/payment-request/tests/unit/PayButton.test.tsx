@@ -16,6 +16,7 @@ const record: PaymentRequest = {
   recipient_id: 'recipient-1',
   recipient_phone: null,
   sender_id: 'sender-1',
+  sender_email: 'sender@example.com',
   status: 'pending',
   updated_at: new Date().toISOString(),
 }

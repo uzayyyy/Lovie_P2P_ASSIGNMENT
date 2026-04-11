@@ -13,8 +13,14 @@ const statusColorMap: Record<
   expired: 'default',
 }
 
-export const StatusBadge = ({ status }: { status: PaymentRequestStatus }) => (
-  <Chip color={statusColorMap[status]} label={status} size="small" />
+export const StatusBadge = ({
+  status,
+  testId,
+}: {
+  status: PaymentRequestStatus
+  testId?: string
+}) => (
+  <Chip color={statusColorMap[status]} data-testid={testId} label={status} size="small" />
 )
 
 export const StatusField = () => {

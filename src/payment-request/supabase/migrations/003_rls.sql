@@ -44,9 +44,20 @@ WITH CHECK (
     )
     OR (
       recipient_id IS NULL
-      AND recipient_email != (
-        SELECT email FROM auth.users WHERE id = auth.uid()
+      AND (
+        recipient_email IS NOT NULL
+        OR recipient_phone IS NOT NULL
       )
+      AND lower(COALESCE(recipient_email, '')) != lower(COALESCE((
+        SELECT email
+        FROM auth.users
+        WHERE id = auth.uid()
+      ), ''))
+      AND COALESCE(recipient_phone, '') != COALESCE((
+        SELECT phone
+        FROM auth.users
+        WHERE id = auth.uid()
+      ), '')
     )
   )
 );

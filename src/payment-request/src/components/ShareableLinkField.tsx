@@ -4,15 +4,24 @@ import { IconButton, InputAdornment, TextField as MuiTextField, Tooltip } from '
 import { useRecordContext } from 'react-admin'
 import type { PaymentRequest } from 'src/types'
 
-export const ShareableLinkField = () => {
+type ShareableLinkFieldProps = {
+  label?: string
+  url?: string
+}
+
+export const ShareableLinkField = ({
+  label = 'Shareable link',
+  url: explicitUrl,
+}: ShareableLinkFieldProps = {}) => {
   const record = useRecordContext<PaymentRequest>()
   const [copied, setCopied] = useState(false)
+  const url =
+    explicitUrl
+    ?? (record ? `${window.location.origin}/request/${record.id}` : null)
 
-  if (!record) {
+  if (!url) {
     return null
   }
-
-  const url = `${window.location.origin}/request/${record.id}`
 
   const handleCopy = async () => {
     if (!navigator.clipboard) {
@@ -39,7 +48,7 @@ export const ShareableLinkField = () => {
         ),
         readOnly: true,
       }}
-      label="Shareable link"
+      label={label}
       value={url}
     />
   )

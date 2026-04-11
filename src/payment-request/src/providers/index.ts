@@ -1,2 +1,2 @@
 export { dataProvider } from './dataProvider'
-export { authProvider } from 'src/auth/supabaseAuthProvider'
+export { authProvider } from './authProvider'

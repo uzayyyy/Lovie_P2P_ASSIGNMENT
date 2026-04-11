@@ -1,65 +1,39 @@
-# Payment Request
+# Payment Request App
 
-P2P Payment Request feature — React Admin v5 + Supabase.
+React Admin v5 + Supabase implementation for the Lovie P2P payment request assignment.
 
-## Phase 1 scaffold setup
-
-### Prerequisites
-
-- Node 20+
-- npm 10+
-- Supabase CLI (`npm install -g supabase`)
-
-### Getting started
+## Quick start
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Start local Supabase
-supabase start
-supabase db push
-
-# 3. Copy env files and fill in your Supabase credentials
 cp .env.local.example .env.local
-
-# 4. Start dev server
 npm run dev
 ```
 
-### Scripts
+## Commands
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start Vite dev server (http://localhost:5173) |
-| `npm run build` | Type-check + production build |
-| `npm run preview` | Preview production build |
-| `npm test` | Run the test suite once |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run test:run` | Run tests once (CI) |
-
-### Project structure
-
-```
-src/
-  auth/                      # Magic link auth provider and pages
-  components/                # Shared UI components
-  pages/                     # Standalone pages (Login, Callback, PublicRequest)
-  providers/                 # Supabase and React Admin providers
-  resources/paymentRequests/ # React Admin resource views
-  types/                     # Shared domain types
-supabase/
-  migrations/               # SQL migrations
-  functions/expire-requests/ # Edge function fallback
-tests/
-  contract/                 # RLS and schema-level tests
-  integration/              # End-to-end flows against local Supabase
-  unit/                     # Component and validation tests
+```bash
+npm run dev
+npm run build
+npm test
+npm run test:e2e
+npm run test:e2e:report
 ```
 
-### Next tasks
+## Important routes
 
-- Wire Supabase migrations and local CLI config
-- Build React Admin resources for create/list/show flows
-- Add public shareable request page and simulation actions
-- Finish contract, integration, and unit test coverage
+- `/` live Supabase-backed app
+- `/demo` public interactive sandbox
+- `/request/demo-public-pending` bundled share-link preview
+
+## Database files
+
+- `supabase/migrations/`
+- `supabase/setup.sql`
+
+## Test artifacts
+
+- `playwright-report/`
+- `test-results/`
+
+The repository root `README.md` contains the full submission context, live demo links, and AI workflow notes.

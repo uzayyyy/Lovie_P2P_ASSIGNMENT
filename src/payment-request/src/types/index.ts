@@ -19,7 +19,9 @@ export interface Profile {
 export interface PaymentRequest {
   id: string
   sender_id: string
-  recipient_email: string
+  /** Email of the sender — stored at insert time for display without joins */
+  sender_email: string | null
+  recipient_email: string | null
   recipient_phone: string | null
   recipient_id: string | null
   amount: number
@@ -43,7 +45,7 @@ export interface PublicPaymentRequest {
 }
 
 export interface PaymentRequestCreateInput {
-  recipient_email: string
+  recipient_email?: string
   recipient_phone?: string
   amount: number
   note?: string
@@ -58,7 +60,7 @@ export interface OutgoingRequestFilter {
 export interface IncomingRequestFilter {
   recipient_id: string
   status?: PaymentRequestStatus
-  'sender_id@ilike'?: string
+  'sender_email@ilike'?: string
 }
 
 export const RESOURCE_PAYMENT_REQUESTS = 'payment_requests' as const

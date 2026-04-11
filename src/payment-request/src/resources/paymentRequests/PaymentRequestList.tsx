@@ -4,6 +4,7 @@ import { Box, Tab, Tabs, useMediaQuery, useTheme } from '@mui/material'
 import {
   Datagrid,
   DateField,
+  FunctionField,
   List,
   NumberField,
   SearchInput,
@@ -17,6 +18,7 @@ import EmptyState from 'src/components/EmptyState'
 import ErrorBoundary from 'src/components/ErrorBoundary'
 import { ExpiryCountdownField } from 'src/components/ExpiryCountdown'
 import { StatusField } from 'src/components/StatusBadge'
+import { formatRequestContact } from 'src/services/paymentRequestHelpers'
 import { supabase } from 'src/providers/supabaseClient'
 import {
   PaymentRequestStatusValues,
@@ -50,8 +52,8 @@ const incomingFilters = [
     alwaysOn
     key="incoming-search"
     parse={(value) => (value ? `*${value}*` : undefined)}
-    placeholder="Search by sender id"
-    source="sender_id@ilike"
+    placeholder="Search by sender email"
+    source="sender_email@ilike"
   />,
   <SelectInput choices={statusChoices} key="incoming-status" source="status" />,
 ]
@@ -62,7 +64,14 @@ const RequestListContent = ({
   tab,
 }: {
   filters: ReactElement[]
-  mobilePrimary: (record: { recipient_email?: string; sender_id?: string }) => string
+  mobilePrimary: (
+    record: {
+      recipient_email?: string | null
+      recipient_phone?: string | null
+      sender_id?: string
+      sender_email?: string | null
+    },
+  ) => string
   tab: 'incoming' | 'outgoing'
 }) => {
   const theme = useTheme()
@@ -129,9 +138,17 @@ const RequestListContent = ({
       ) : (
         <Datagrid rowClick="show">
           {tab === 'outgoing' ? (
-            <TextField label="Recipient" source="recipient_email" />
+            <FunctionField
+              label="Recipient"
+              render={(record: { recipient_email?: string | null; recipient_phone?: string | null }) =>
+                formatRequestContact(
+                  record.recipient_email,
+                  record.recipient_phone,
+                  'Unknown recipient',
+                )}
+            />
           ) : (
-            <TextField label="Sender" source="sender_id" />
+            <TextField label="Sender" source="sender_email" />
           )}
           <NumberField
             options={{ currency: 'TRY', style: 'currency' }}
@@ -164,13 +181,23 @@ const PaymentRequestList = () => {
         {tab === 'outgoing' ? (
           <RequestListContent
             filters={outgoingFilters}
-            mobilePrimary={(record) => record.recipient_email ?? 'Unknown recipient'}
+            mobilePrimary={(record) =>
+              formatRequestContact(
+                record.recipient_email,
+                record.recipient_phone,
+                'Unknown recipient',
+              )}
             tab="outgoing"
           />
         ) : (
           <RequestListContent
             filters={incomingFilters}
-            mobilePrimary={(record) => record.sender_id ?? 'Unknown sender'}
+            mobilePrimary={(record) =>
+              formatRequestContact(
+                record.sender_email,
+                undefined,
+                record.sender_id ?? 'Unknown sender',
+              )}
             tab="incoming"
           />
         )}

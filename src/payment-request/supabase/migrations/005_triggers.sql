@@ -10,7 +10,17 @@ BEGIN
     recipient_id = NEW.id,
     updated_at = now()
   WHERE
-    recipient_email = NEW.email
+    (
+      (
+        recipient_email IS NOT NULL
+        AND lower(recipient_email) = lower(NEW.email)
+      )
+      OR (
+        recipient_phone IS NOT NULL
+        AND NEW.phone IS NOT NULL
+        AND recipient_phone = NEW.phone
+      )
+    )
     AND recipient_id IS NULL
     AND status = 'pending';
 

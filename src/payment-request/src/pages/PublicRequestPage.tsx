@@ -4,6 +4,7 @@ import { Alert, Box, Button, Card, CardContent, Skeleton, Stack, Typography } fr
 import { ExpiryCountdown } from 'src/components/ExpiryCountdown'
 import { StatusBadge } from 'src/components/StatusBadge'
 import { supabase } from 'src/providers/supabaseClient'
+import { DEMO_PUBLIC_PREVIEW_REQUESTS } from 'src/services/demoPaymentRequests'
 import { RESOURCE_PUBLIC_VIEW, type PublicPaymentRequest } from 'src/types'
 
 const currencyFormatter = new Intl.NumberFormat('tr-TR', {
@@ -16,11 +17,25 @@ const PublicRequestPage = () => {
   const [request, setRequest] = useState<PublicPaymentRequest | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isPreview, setIsPreview] = useState(false)
 
   useEffect(() => {
     const loadRequest = async () => {
       if (!id) {
         setError('Request not found')
+        setLoading(false)
+        return
+      }
+
+      setError(null)
+      setIsPreview(false)
+      setLoading(true)
+
+      const previewRequest = DEMO_PUBLIC_PREVIEW_REQUESTS[id]
+
+      if (previewRequest) {
+        setRequest(previewRequest)
+        setIsPreview(true)
         setLoading(false)
         return
       }
@@ -71,6 +86,12 @@ const PublicRequestPage = () => {
       <Card>
         <CardContent>
           <Stack spacing={2}>
+            {isPreview ? (
+              <Alert severity="info">
+                Demo preview mode: this sample share link is bundled with the app so reviewers
+                can validate the public request experience without signing in first.
+              </Alert>
+            ) : null}
             <Typography variant="h4">
               {currencyFormatter.format(request.amount)}
             </Typography>

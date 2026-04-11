@@ -85,7 +85,11 @@ export const createTestUserWithEmail = async (email: string, label = 'test-user'
 }
 
 export const createTestRequest = async (
-  partial: Partial<PaymentRequest> & Pick<PaymentRequest, 'sender_id' | 'recipient_email' | 'amount'>,
+  partial: Partial<PaymentRequest> &
+    Pick<PaymentRequest, 'sender_id' | 'amount'> & {
+      recipient_email?: string | null
+      recipient_phone?: string | null
+    },
 ) => {
   const service = createServiceClient()
   const payload = {
@@ -99,6 +103,7 @@ export const createTestRequest = async (
     recipient_id: partial.recipient_id ?? null,
     recipient_phone: partial.recipient_phone ?? null,
     sender_id: partial.sender_id,
+    sender_email: partial.sender_email ?? null,
     status: partial.status ?? 'pending',
     updated_at: partial.updated_at,
   }

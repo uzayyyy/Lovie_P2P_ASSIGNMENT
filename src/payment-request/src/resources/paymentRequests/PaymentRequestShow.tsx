@@ -1,6 +1,7 @@
 import { Box, Stack } from '@mui/material'
 import {
   DateField,
+  FunctionField,
   NumberField,
   Show,
   SimpleShowLayout,
@@ -14,6 +15,7 @@ import { ExpiryCountdownField } from 'src/components/ExpiryCountdown'
 import { PayButton } from 'src/components/PayButton'
 import { ShareableLinkField } from 'src/components/ShareableLinkField'
 import { StatusField } from 'src/components/StatusBadge'
+import { formatRequestContact } from 'src/services/paymentRequestHelpers'
 import type { PaymentRequest } from 'src/types'
 
 type Identity = {
@@ -36,9 +38,17 @@ const PaymentRequestShowContent = () => {
   return (
     <SimpleShowLayout>
       <NumberField options={{ currency: 'TRY', style: 'currency' }} source="amount" />
-      <TextField label="Sender" source="sender_id" />
-      <TextField label="Recipient Email" source="recipient_email" />
-      <TextField label="Recipient Phone" source="recipient_phone" />
+      <TextField label="Sender" source="sender_email" />
+      <FunctionField
+        label="Recipient"
+        render={(request: PaymentRequest) =>
+          formatRequestContact(
+            request.recipient_email,
+            request.recipient_phone,
+            'Unknown recipient',
+          )
+        }
+      />
       <TextField source="note" />
       <StatusField />
       <DateField showTime source="created_at" />

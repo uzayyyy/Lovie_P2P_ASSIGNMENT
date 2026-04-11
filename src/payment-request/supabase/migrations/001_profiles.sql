@@ -15,9 +15,14 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, display_name)
-  VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email))
-  ON CONFLICT (id) DO NOTHING;
+  INSERT INTO public.profiles (id, display_name, phone)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
+    NULLIF(NEW.phone, '')
+  )
+  ON CONFLICT (id) DO UPDATE
+  SET phone = COALESCE(public.profiles.phone, EXCLUDED.phone);
 
   RETURN NEW;
 END;

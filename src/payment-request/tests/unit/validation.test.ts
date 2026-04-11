@@ -26,8 +26,11 @@ const runValidators = (
   )
 
 describe('payment request validation', () => {
-  it('validates recipient email addresses', () => {
-    expect(validateRecipientEmail('')).toEqual(expect.any(String))
+  it('accepts either email or phone for the recipient', () => {
+    expect(validateRecipientEmail('', { recipient_phone: '' })).toBe(
+      'Provide a recipient email or phone number',
+    )
+    expect(validateRecipientEmail('', { recipient_phone: '+905550000000' })).toBeUndefined()
     expect(validateRecipientEmail('invalid')).toBe('Enter a valid email address')
     expect(validateRecipientEmail('a@b.com')).toBeUndefined()
   })
@@ -35,7 +38,7 @@ describe('payment request validation', () => {
   it('validates phone numbers', () => {
     expect(validatePhone('+905550000000')).toBeUndefined()
     expect(validatePhone('05550000000')).toBe(
-      'Enter a valid phone number (e.g. +90 555 000 0000)',
+      'Enter a valid phone number (e.g. +905550000000)',
     )
   })
 
