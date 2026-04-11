@@ -56,6 +56,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+    },
   },
 })
 
@@ -63,14 +70,14 @@ const MinimalAppBar = () => (
   <MuiAppBar
     color="transparent"
     elevation={0}
-    position="fixed"
+    position="sticky"
     sx={{
       backdropFilter: 'blur(18px)',
       borderBottom: '1px solid rgba(18, 50, 95, 0.08)',
       color: 'text.primary',
     }}
   >
-    <Toolbar sx={{ gap: 2, minHeight: { sm: 72, xs: 72 } }}>
+    <Toolbar sx={{ gap: 2, minHeight: { sm: 64, xs: 64 } }}>
       <Typography sx={{ fontFamily: '"Space Grotesk", "Segoe UI", sans-serif', fontWeight: 700 }}>
         Lovie Payment Request
       </Typography>
