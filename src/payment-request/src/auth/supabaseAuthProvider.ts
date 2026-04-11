@@ -35,9 +35,18 @@ const baseAuthProvider = supabaseAuthProvider(supabase, {
 
 export const authProvider = {
   ...baseAuthProvider,
-  async login(params: { email?: string }) {
+  async login(params: { email?: string; password?: string }) {
     if (!params.email) {
       throw new Error('Email is required')
+    }
+
+    if (params.password) {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: params.email,
+        password: params.password,
+      })
+      if (error) throw error
+      return
     }
 
     const { error } = await supabase.auth.signInWithOtp({

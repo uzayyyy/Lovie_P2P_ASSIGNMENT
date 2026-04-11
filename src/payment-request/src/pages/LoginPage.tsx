@@ -33,18 +33,30 @@ const featureCards = [
 const LoginPage = () => {
   const notify = useNotify()
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const [mode, setMode] = useState<'password' | 'magic'>('password')
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoading(true)
+    setSent(false)
+
+    if (mode === 'password') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      setLoading(false)
+      if (error) {
+        notify(error.message, { type: 'error' })
+      } else {
+        window.location.href = '/'
+      }
+      return
+    }
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
 
     setLoading(false)
@@ -180,13 +192,12 @@ const LoginPage = () => {
                     Live Supabase sign-in
                   </Typography>
                   <Typography color="text.secondary">
-                    Send yourself a magic link to enter the persisted React Admin dashboard.
+                    Sign in with email + password, or send a magic link.
                   </Typography>
                 </Box>
 
                 <Alert severity="info">
-                  The interactive demo is public. Use the live sign-in below when you want to validate
-                  the real auth and database path.
+                  The interactive demo is public. Use sign-in below to validate the real auth and database path.
                 </Alert>
 
                 <Box component="form" onSubmit={handleSubmit} sx={{ display: 'grid', gap: 2 }}>
@@ -197,12 +208,37 @@ const LoginPage = () => {
                     type="email"
                     value={email}
                   />
+                  {mode === 'password' ? (
+                    <TextField
+                      label="Password"
+                      onChange={(event) => setPassword(event.target.value)}
+                      required
+                      type="password"
+                      value={password}
+                    />
+                  ) : null}
                   <Button disabled={loading} size="large" type="submit" variant="contained">
-                    {loading ? 'Sending…' : 'Send magic link'}
+                    {loading
+                      ? 'Please wait...'
+                      : mode === 'password'
+                        ? 'Sign in'
+                        : 'Send magic link'}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setMode(mode === 'password' ? 'magic' : 'password')
+                      setSent(false)
+                    }}
+                    size="small"
+                    sx={{ alignSelf: 'center' }}
+                    type="button"
+                    variant="text"
+                  >
+                    {mode === 'password' ? 'Use magic link instead' : 'Use password instead'}
                   </Button>
                   {sent ? (
                     <Alert severity="success">
-                      Check your inbox for the magic link. After redirect, you’ll land in the live dashboard.
+                      Check your inbox for the magic link. After redirect, you'll land in the live dashboard.
                     </Alert>
                   ) : null}
                 </Box>
