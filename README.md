@@ -6,9 +6,9 @@ P2P payment request prototype built for the Lovie interview workflow using Spec-
 
 | Path | URL |
 |------|-----|
-| Interactive demo (no login) | **https://payment-request-two.vercel.app/demo** |
-| Public share-link preview | **https://payment-request-two.vercel.app/request/demo-public-pending** |
-| Live Supabase-backed app | **https://payment-request-two.vercel.app/** |
+| Interactive demo (no login) | **https://lovie-p2p-demo.vercel.app/demo** |
+| Public share-link preview | **https://lovie-p2p-demo.vercel.app/request/demo-public-pending** |
+| Live Supabase-backed app | **https://lovie-p2p-demo.vercel.app/** |
 
 > The `/demo` route is a public sandbox — no email or account required.  
 > Use it to exercise the full create → pay / cancel flow instantly.
