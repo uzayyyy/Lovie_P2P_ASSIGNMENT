@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Chip,
+  Divider,
   Grid,
   Paper,
   Stack,
@@ -14,6 +15,8 @@ import {
 import { useNotify } from 'react-admin'
 import { supabase } from 'src/providers/supabaseClient'
 import { DEMO_CURRENT_USER } from 'src/services/demoPaymentRequests'
+
+type Mode = 'magic' | 'password' | 'signup'
 
 const featureCards = [
   {
@@ -34,14 +37,40 @@ const LoginPage = () => {
   const notify = useNotify()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
-  const [mode, setMode] = useState<'password' | 'magic'>('magic')
+  const [mode, setMode] = useState<Mode>('magic')
+
+  const switchMode = (next: Mode) => {
+    setMode(next)
+    setSent(false)
+    setPassword('')
+    setConfirmPassword('')
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoading(true)
     setSent(false)
+
+    if (mode === 'signup') {
+      if (password !== confirmPassword) {
+        notify('Passwords do not match', { type: 'error' })
+        setLoading(false)
+        return
+      }
+      const { data, error } = await supabase.auth.signUp({ email, password })
+      setLoading(false)
+      if (error) {
+        notify(error.message, { type: 'error' })
+      } else if (data.session) {
+        window.location.href = '/'
+      } else {
+        setSent(true)
+      }
+      return
+    }
 
     if (mode === 'password') {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -67,6 +96,13 @@ const LoginPage = () => {
     }
 
     setSent(true)
+  }
+
+  const submitLabel = () => {
+    if (loading) return 'Please wait...'
+    if (mode === 'signup') return 'Create account'
+    if (mode === 'password') return 'Sign in'
+    return 'Send magic link'
   }
 
   return (
@@ -189,10 +225,14 @@ const LoginPage = () => {
               <Stack spacing={3}>
                 <Box>
                   <Typography gutterBottom variant="h4">
-                    Live Supabase sign-in
+                    {mode === 'signup' ? 'Create account' : 'Sign in'}
                   </Typography>
                   <Typography color="text.secondary">
-                    New users: enter your email below — a magic link signs you in and creates your account.
+                    {mode === 'signup'
+                      ? 'Register with email and password to use the live Supabase app.'
+                      : mode === 'magic'
+                        ? 'Enter your email — we will send a one-click login link.'
+                        : 'Sign in with your email and password.'}
                   </Typography>
                 </Box>
 
@@ -208,7 +248,7 @@ const LoginPage = () => {
                     type="email"
                     value={email}
                   />
-                  {mode === 'password' ? (
+                  {mode === 'password' || mode === 'signup' ? (
                     <TextField
                       label="Password"
                       onChange={(event) => setPassword(event.target.value)}
@@ -217,28 +257,55 @@ const LoginPage = () => {
                       value={password}
                     />
                   ) : null}
+                  {mode === 'signup' ? (
+                    <TextField
+                      label="Confirm password"
+                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      required
+                      type="password"
+                      value={confirmPassword}
+                    />
+                  ) : null}
                   <Button disabled={loading} size="large" type="submit" variant="contained">
-                    {loading
-                      ? 'Please wait...'
-                      : mode === 'password'
-                        ? 'Sign in'
-                        : 'Send magic link'}
+                    {submitLabel()}
                   </Button>
-                  <Button
-                    onClick={() => {
-                      setMode(mode === 'password' ? 'magic' : 'password')
-                      setSent(false)
-                    }}
-                    size="small"
-                    sx={{ alignSelf: 'center' }}
-                    type="button"
-                    variant="text"
-                  >
-                    {mode === 'password' ? 'Use magic link instead' : 'Use password instead'}
-                  </Button>
+
+                  <Divider />
+
+                  {mode === 'signup' ? (
+                    <Stack spacing={1}>
+                      <Button onClick={() => switchMode('password')} size="small" type="button" variant="text">
+                        Already have an account? Sign in
+                      </Button>
+                      <Button onClick={() => switchMode('magic')} size="small" type="button" variant="text">
+                        Use magic link instead
+                      </Button>
+                    </Stack>
+                  ) : mode === 'password' ? (
+                    <Stack spacing={1}>
+                      <Button onClick={() => switchMode('signup')} size="small" type="button" variant="text">
+                        No account yet? Create one
+                      </Button>
+                      <Button onClick={() => switchMode('magic')} size="small" type="button" variant="text">
+                        Forgot password? Use magic link
+                      </Button>
+                    </Stack>
+                  ) : (
+                    <Stack spacing={1}>
+                      <Button onClick={() => switchMode('signup')} size="small" type="button" variant="text">
+                        No account yet? Create one
+                      </Button>
+                      <Button onClick={() => switchMode('password')} size="small" type="button" variant="text">
+                        Have a password? Sign in
+                      </Button>
+                    </Stack>
+                  )}
+
                   {sent ? (
                     <Alert severity="success">
-                      Check your inbox for the magic link. It will sign you in (and create your account if you are new).
+                      {mode === 'signup'
+                        ? 'Check your inbox to confirm your email, then sign in.'
+                        : 'Check your inbox for the magic link. It will sign you in (and create your account if you are new).'}
                     </Alert>
                   ) : null}
                 </Box>
