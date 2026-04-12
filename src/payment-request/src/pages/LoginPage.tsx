@@ -60,7 +60,11 @@ const LoginPage = () => {
         setLoading(false)
         return
       }
-      const { data, error } = await supabase.auth.signUp({ email, password })
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      })
       setLoading(false)
       if (error) {
         notify(error.message, { type: 'error' })
