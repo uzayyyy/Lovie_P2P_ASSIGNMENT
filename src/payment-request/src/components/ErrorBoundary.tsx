@@ -7,28 +7,28 @@ type ErrorBoundaryProps = {
 
 type ErrorBoundaryState = {
   hasError: boolean
+  errorMsg: string
 }
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   state: ErrorBoundaryState = {
     hasError: false,
+    errorMsg: '',
   }
 
-  static getDerivedStateFromError() {
-    return { hasError: true }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, errorMsg: error?.message ?? String(error) }
   }
 
   componentDidCatch(error: Error) {
-    if (import.meta.env.DEV) {
-      console.error(error)
-    }
+    console.error('[ErrorBoundary]', error)
   }
 
   render() {
     if (this.state.hasError) {
       return (
         <Alert severity="error">
-          Failed to load requests. Please refresh the page.
+          {this.state.errorMsg || 'Failed to load requests. Please refresh the page.'}
         </Alert>
       )
     }
