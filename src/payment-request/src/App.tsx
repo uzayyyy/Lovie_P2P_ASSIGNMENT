@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   AppBar as MuiAppBar,
   Box,
@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import { Admin, Layout, useLogout, useGetIdentity, useNotify, type LayoutProps } from 'react-admin'
 import { supabase } from 'src/providers/supabaseClient'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
 import { authProvider, dataProvider } from 'src/providers'
 import AuthCallbackPage from 'src/pages/AuthCallbackPage'
 import DemoWorkspacePage from 'src/pages/DemoWorkspacePage'
@@ -183,12 +183,39 @@ const AppLayout = (props: LayoutProps) => (
   <Layout {...props} appBar={MinimalAppBar} menu={EmptyMenu} sidebar={EmptySidebar} />
 )
 
+const RootRedirect = () => {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    let active = true
+
+    const redirect = async () => {
+      const { data } = await supabase.auth.getSession()
+
+      if (!active) {
+        return
+      }
+
+      navigate(data.session ? '/payment_requests' : '/login', { replace: true })
+    }
+
+    void redirect()
+
+    return () => {
+      active = false
+    }
+  }, [navigate])
+
+  return null
+}
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
         <Routes>
+          <Route element={<RootRedirect />} path="/" />
           <Route element={<AuthCallbackPage />} path="/auth/callback" />
           <Route element={<DemoWorkspacePage />} path="/demo" />
           <Route element={<DemoWorkspacePage />} path="/demo/request/:id" />
