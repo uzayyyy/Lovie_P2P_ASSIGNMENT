@@ -1,4 +1,5 @@
-import { Box, Stack } from '@mui/material'
+import { Box, Button, Stack } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import {
   DateField,
   FunctionField,
@@ -9,6 +10,7 @@ import {
   useGetIdentity,
   useRecordContext,
 } from 'react-admin'
+import { useNavigate } from 'react-router-dom'
 import { CancelButton } from 'src/components/CancelButton'
 import { DeclineButton } from 'src/components/DeclineButton'
 import { ExpiryCountdownField } from 'src/components/ExpiryCountdown'
@@ -26,6 +28,7 @@ const PaymentRequestShowContent = () => {
   const record = useRecordContext<PaymentRequest>()
   const { data } = useGetIdentity()
   const identity = data as Identity | undefined
+  const navigate = useNavigate()
 
   if (!record) {
     return null
@@ -37,6 +40,16 @@ const PaymentRequestShowContent = () => {
 
   return (
     <SimpleShowLayout>
+      <Box sx={{ mb: 1 }}>
+        <Button
+          onClick={() => navigate('/payment_requests')}
+          size="small"
+          startIcon={<ArrowBackIcon />}
+          variant="text"
+        >
+          Back to dashboard
+        </Button>
+      </Box>
       <NumberField options={{ currency: 'TRY', style: 'currency' }} source="amount" />
       <TextField label="Sender" source="sender_email" />
       <FunctionField
