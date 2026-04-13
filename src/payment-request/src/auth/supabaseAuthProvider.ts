@@ -35,6 +35,14 @@ const baseAuthProvider = supabaseAuthProvider(supabase, {
 
 export const authProvider = {
   ...baseAuthProvider,
+  // Only treat 401 as an auth failure. Other HTTP errors (400, 422, 500)
+  // are data/validation errors and should NOT redirect to the login page.
+  checkError: async (error: { status?: number }) => {
+    if (error?.status === 401) {
+      return Promise.reject({ message: 'ra.auth.auth_check_error' })
+    }
+    return Promise.resolve()
+  },
   async login(params: { email?: string; password?: string }) {
     if (!params.email) {
       throw new Error('Email is required')

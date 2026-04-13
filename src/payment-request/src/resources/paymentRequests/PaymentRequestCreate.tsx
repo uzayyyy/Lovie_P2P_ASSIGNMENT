@@ -51,8 +51,12 @@ const PaymentRequestCreate = () => {
         note: normalizeOptionalString(data.note),
         recipient_email: normalizeOptionalString(data.recipient_email),
         recipient_phone: normalizeOptionalString(data.recipient_phone),
-        sender_id: identity?.id ?? '',
-        sender_email: identity?.email ?? null,
+        // sender_id and sender_email are set server-side by the
+        // set_sender_on_insert BEFORE INSERT trigger from auth.uid().
+        // Never send them from the client to avoid empty-UUID errors
+        // when identity hasn't loaded yet.
+        sender_id: undefined,
+        sender_email: undefined,
       })}
     >
       <SimpleForm>
