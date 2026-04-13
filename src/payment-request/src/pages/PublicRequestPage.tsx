@@ -7,12 +7,15 @@ import {
   Button,
   Chip,
   Divider,
+  IconButton,
   Paper,
   Skeleton,
   Stack,
   Toolbar,
+  Tooltip,
   Typography,
 } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { ExpiryCountdown } from 'src/components/ExpiryCountdown'
 import { supabase } from 'src/providers/supabaseClient'
 import { DEMO_PUBLIC_PREVIEW_REQUESTS } from 'src/services/demoPaymentRequests'
@@ -97,7 +100,17 @@ const PublicRequestPage = () => {
           borderBottom: '1px solid rgba(18, 50, 95, 0.08)',
         }}
       >
-        <Toolbar sx={{ gap: 2 }}>
+        <Toolbar sx={{ gap: 1 }}>
+          <Tooltip title="Back">
+            <IconButton
+              aria-label="back"
+              component={RouterLink}
+              size="small"
+              to="/login"
+            >
+              <ArrowBackIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <Typography
             component={RouterLink}
             sx={{

@@ -15,6 +15,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { SIMULATION_DELAY_MS } from 'src/components/PayButton'
 import { ExpiryCountdown } from 'src/components/ExpiryCountdown'
 import { ShareableLinkField } from 'src/components/ShareableLinkField'
@@ -265,6 +266,14 @@ const DemoWorkspacePage = () => {
                   view, pay, decline, cancel, and expiration behaviors.
                 </Typography>
                 <Stack direction={{ sm: 'row', xs: 'column' }} spacing={1.5}>
+                  <Button
+                    component={RouterLink}
+                    startIcon={<ArrowBackIcon />}
+                    to="/login"
+                    variant="outlined"
+                  >
+                    Back
+                  </Button>
                   <Button component={RouterLink} to="/" variant="contained">
                     Open live Supabase flow
                   </Button>
