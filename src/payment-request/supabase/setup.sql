@@ -107,12 +107,8 @@ CREATE POLICY payment_requests_insert_own ON public.payment_requests FOR INSERT 
       OR (
         recipient_id IS NULL
         AND (recipient_email IS NOT NULL OR recipient_phone IS NOT NULL)
-        AND lower(COALESCE(recipient_email, '')) != lower(COALESCE((
-          SELECT email FROM auth.users WHERE id = auth.uid()
-        ), ''))
-        AND COALESCE(recipient_phone, '') != COALESCE((
-          SELECT phone FROM auth.users WHERE id = auth.uid()
-        ), '')
+        AND (recipient_email IS NULL OR lower(recipient_email) != lower(COALESCE(auth.jwt() ->> 'email', '')))
+        AND (recipient_phone IS NULL OR recipient_phone != COALESCE(auth.jwt() ->> 'phone', ''))
       )
     )
   );
@@ -139,7 +135,26 @@ FROM public.payment_requests;
 GRANT  SELECT ON public.public_payment_request_view TO anon;
 REVOKE ALL     ON public.payment_requests            FROM anon;
 
--- ── 5. Trigger: resolve recipient_id when a matching user signs up ────────────
+-- ── 5. Trigger: stamp sender_id and sender_email from JWT on INSERT ──────────
+CREATE OR REPLACE FUNCTION public.set_payment_request_sender()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  NEW.sender_id    := auth.uid();
+  NEW.sender_email := auth.jwt() ->> 'email';
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS set_sender_on_insert ON public.payment_requests;
+CREATE TRIGGER set_sender_on_insert
+  BEFORE INSERT ON public.payment_requests
+  FOR EACH ROW EXECUTE FUNCTION public.set_payment_request_sender();
+
+-- ── 6. Trigger: resolve recipient_id when a matching user signs up ────────────
 CREATE OR REPLACE FUNCTION public.resolve_recipient_id()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
@@ -177,12 +192,12 @@ FROM auth.users user_record
 WHERE profile.id = user_record.id
   AND profile.phone IS DISTINCT FROM NULLIF(user_record.phone, '');
 
--- ── 6. pg_cron: hourly expiration (enable pg_cron extension in Dashboard first)
+-- ── 7. pg_cron: hourly expiration (enable pg_cron extension in Dashboard first)
 -- Dashboard → Database → Extensions → pg_cron → Enable
 -- Then run:
 --   SELECT cron.schedule('expire-payment-requests','0 * * * *',
 --     $$ UPDATE public.payment_requests SET status='expired', updated_at=now()
 --        WHERE status='pending' AND expires_at < now(); $$);
 
--- ── 7. Seed data for demo (optional — remove for production) ─────────────────
+-- ── 8. Seed data for demo (optional — remove for production) ─────────────────
 -- Seed is handled by scripts/seed-demo.sql (run separately after auth users exist)
