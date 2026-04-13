@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env.local
+.env.test
+.env
+coverage/
+playwright-report/
+test-results/
+supabase/.branches/
+supabase/.temp/
+supabase/.cache/
+.vercel
