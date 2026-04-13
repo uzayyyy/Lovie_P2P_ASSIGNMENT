@@ -39,6 +39,7 @@ env/
 .env
 .env.local
 *.lock
+.playwright-cli/
 
 # Spec Kit-specific files
 .genreleases/

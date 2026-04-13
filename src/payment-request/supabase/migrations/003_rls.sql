@@ -48,16 +48,8 @@ WITH CHECK (
         recipient_email IS NOT NULL
         OR recipient_phone IS NOT NULL
       )
-      AND lower(COALESCE(recipient_email, '')) != lower(COALESCE((
-        SELECT email
-        FROM auth.users
-        WHERE id = auth.uid()
-      ), ''))
-      AND COALESCE(recipient_phone, '') != COALESCE((
-        SELECT phone
-        FROM auth.users
-        WHERE id = auth.uid()
-      ), '')
+      AND (recipient_email IS NULL OR lower(recipient_email) != lower(COALESCE(auth.jwt() ->> 'email', '')))
+      AND (recipient_phone IS NULL OR recipient_phone != COALESCE(auth.jwt() ->> 'phone', ''))
     )
   )
 );
